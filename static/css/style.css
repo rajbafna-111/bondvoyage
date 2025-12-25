@@ -1,0 +1,525 @@
+/* Modern Color Palette */
+:root {
+    --primary-color: #00b894; /* Fresh Teal */
+    --secondary-color: #2d3436; /* Dark Grey */
+    --accent-color: #fdcb6e; /* Warm Yellow */
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    background-color: #f4f7f6;
+    padding-top: 80px;
+}
+
+h1, h2, h3, h4, h5, .navbar-brand {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+}
+
+/* Navbar Polish */
+.navbar {
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    z-index: 1030; /* Bootstrap default, but good to be safe */
+    background-color: rgba(255, 255, 255, 0.90) !important; /* slight transparency looks cool! */
+    backdrop-filter: blur(10px); /* Blurs the content scrolling behind it */
+}
+
+.navbar-brand {
+    color: var(--primary-color) !important;
+    font-size: 1.5rem;
+    letter-spacing: -1px;
+}
+
+/* Hero Section (The big banner) */
+.hero-section {
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 100px 0;
+    /* border-radius: 0 0 50px 50px; Modern curve at bottom */
+    margin-bottom: 50px;
+}
+
+/* Card Improvements */
+.tour-card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: white;
+}
+
+.tour-card:hover {
+    transform: translateY(-5px); /* Moves up slightly */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.tour-card img {
+    height: 220px;
+    object-fit: cover;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 50px; /* Pill shaped buttons */
+    padding: 10px 25px;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background-color: #01997a;
+}
+
+
+
+
+
+
+/* --- Tour Detail Page Styles --- */
+
+/* Image Styling */
+.detail-image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15); /* Soft, deep shadow */
+}
+
+.detail-image {
+    width: 100%;
+    height: 500px; /* Fixed height for consistency */
+    object-fit: cover; /* Ensures image covers area without stretching */
+    transition: transform 0.5s ease;
+}
+
+.detail-image:hover {
+    transform: scale(1.02); /* Subtle zoom effect */
+}
+
+/* Typography */
+.tour-title {
+    font-weight: 800;
+    color: var(--secondary-color);
+    letter-spacing: -1px;
+    margin-bottom: 0.5rem;
+}
+
+.tour-location {
+    font-size: 1.2rem;
+    color: #636e72;
+    font-weight: 500;
+    margin-bottom: 2rem;
+}
+
+.section-divider {
+    width: 60px;
+    height: 4px;
+    background-color: var(--primary-color); /* Teal line */
+    margin: 1.5rem 0;
+    border: none;
+    opacity: 1;
+}
+
+.tour-description {
+    font-size: 1.1rem;
+    line-height: 1.8; /* Improves readability */
+    color: #4a4a4a;
+}
+
+/* Info Box (Price & Duration) */
+.info-box {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #f0f0f0;
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price-tag {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.duration-tag {
+    font-size: 1.1rem;
+    color: #636e72;
+    font-weight: 600;
+}
+
+/* Buttons */
+.btn-book {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 15px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-radius: 50px; /* Pill shape */
+    box-shadow: 0 10px 20px rgba(0, 184, 148, 0.3); /* Colored shadow */
+    transition: all 0.3s ease;
+}
+
+.btn-book:hover {
+    background-color: #01997a;
+    transform: translateY(-3px); /* Floats up */
+    box-shadow: 0 15px 25px rgba(0, 184, 148, 0.4);
+    color: white;
+}
+
+.btn-back {
+    border-radius: 50px;
+    padding: 12px;
+    font-weight: 600;
+    border: 2px solid #dfe6e9;
+    color: #636e72;
+}
+
+.btn-back:hover {
+    background-color: #dfe6e9;
+    color: #2d3436;
+}
+
+
+
+
+
+
+
+
+/* --- Booking Page Styles --- */
+
+.booking-card {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08); /* Soft floating effect */
+}
+
+.booking-header {
+    background-color: var(--secondary-color); /* Dark grey header */
+    padding: 25px;
+    text-align: center;
+    border-bottom: 5px solid var(--primary-color); /* Teal accent line */
+}
+
+.booking-header h4 {
+    color: white;
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.booking-body {
+    padding: 40px;
+}
+
+.booking-summary {
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-left: 4px solid var(--accent-color); /* Yellow accent */
+}
+
+.booking-summary h5 {
+    color: var(--secondary-color);
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.form-label-custom {
+    font-weight: 600;
+    color: #2d3436;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Custom Input Styling */
+.form-control, .form-select {
+    border-radius: 10px;
+    padding: 12px 15px;
+    border: 1px solid #dfe6e9;
+    background-color: #fff;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(0, 184, 148, 0.1); /* Teal glow */
+}
+
+.btn-confirm {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 15px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 10px;
+    width: 100%;
+    margin-top: 15px;
+    transition: all 0.3s;
+}
+
+.btn-confirm:hover {
+    background-color: #01997a;
+    box-shadow: 0 10px 20px rgba(0, 184, 148, 0.3);
+}
+
+.btn-cancel-booking {
+    color: #636e72;
+    text-decoration: none;
+    font-weight: 600;
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 10px;
+    transition: background 0.2s;
+}
+
+.btn-cancel-booking:hover {
+    background-color: #f1f2f6;
+    color: #2d3436;
+}
+
+
+
+
+
+
+
+/* --- Dashboard / History Styles --- */
+
+.dashboard-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    overflow: hidden;
+    background: white;
+}
+
+.dashboard-header {
+    background-color: #2d3436;
+    padding: 20px 30px;
+    border-bottom: 4px solid var(--primary-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-header h5 {
+    color: white;
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Custom Table Styling */
+.custom-table {
+    margin-bottom: 0;
+}
+
+.custom-table thead th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dfe6e9;
+    color: #636e72;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    padding: 15px;
+}
+
+.custom-table tbody td {
+    padding: 20px 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f2f6;
+    color: #2d3436;
+}
+
+.custom-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.custom-table tbody tr:hover {
+    background-color: #f8fffd; /* Very light teal tint on hover */
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 8px 12px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.status-confirmed {
+    background-color: #e6fffa;
+    color: #00b894;
+}
+
+.status-pending {
+    background-color: #fff8e1;
+    color: #ffb900;
+}
+
+.status-cancelled {
+    background-color: #ffebee;
+    color: #ff7675;
+}
+
+/* Tour Date & Name Styling */
+.history-tour-name {
+    font-weight: 700;
+    color: var(--secondary-color);
+    display: block;
+    font-size: 1.05rem;
+}
+
+.history-date {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.btn-cancel-small {
+    color: #ff7675;
+    border: 1px solid #ff7675;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-cancel-small:hover {
+    background-color: #ff7675;
+    color: white;
+}
+
+
+
+
+
+
+/* --- Admin Dashboard Styles --- */
+
+.admin-header {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.admin-title h2 {
+    font-weight: 800;
+    color: var(--secondary-color);
+    margin: 0;
+}
+
+.admin-title p {
+    color: #636e72;
+    margin: 0;
+}
+
+/* Action Buttons Toolbar */
+.admin-toolbar {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-admin-action {
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.btn-admin-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Stat Cards */
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    border: none;
+    height: 100%;
+    transition: transform 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon-bg {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 5rem;
+    opacity: 0.1;
+    transform: rotate(15deg);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1;
+}
+
+/* Specific Card Colors */
+.card-revenue {
+    background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+    color: white;
+}
+
+.card-revenue .stat-label { color: rgba(255,255,255,0.8); }
+
+.card-total { border-left: 5px solid #636e72; }
+.card-total .stat-value { color: #2d3436; }
+.card-total .stat-label { color: #636e72; }
+
+.card-confirmed { border-left: 5px solid #00b894; }
+.card-confirmed .stat-value { color: #00b894; }
+.card-confirmed .stat-label { color: #00b894; }
+
+.card-pending { border-left: 5px solid #fdcb6e; }
+.card-pending .stat-value { color: #e1b12c; }
+.card-pending .stat-label { color: #e1b12c; }
+
+.card-cancelled { border-left: 5px solid #ff7675; }
+.card-cancelled .stat-value { color: #d63031; }
+.card-cancelled .stat-label { color: #d63031; }

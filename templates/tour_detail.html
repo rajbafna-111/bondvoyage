@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mt-5 align-items-center">
+    <div class="col-lg-6 mb-4 mb-lg-0">
+        <div class="detail-image-container">
+            {% if tour.image %}
+                <img src="{{ tour.image.url }}" class="detail-image" alt="{{ tour.name }}">
+            {% else %}
+                <div class="bg-secondary text-white d-flex justify-content-center align-items-center" style="height: 500px;">
+                    <i class="fas fa-image fa-4x"></i>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-lg-6 ps-lg-5"> <h1 class="tour-title">{{ tour.name }}</h1>
+        <div class="tour-location">
+            <i class="fas fa-map-marker-alt text-danger me-2"></i> {{ tour.location }}
+        </div>
+
+        <hr class="section-divider">
+        
+        <p class="tour-description">{{ tour.description }}</p>
+        
+        <div class="info-box shadow-sm">
+            <div>
+                <span class="d-block text-muted text-uppercase small fw-bold mb-1">Total Price</span>
+                <h2 class="price-tag">${{ tour.price }}</h2>
+            </div>
+            <div class="text-end">
+                <span class="d-block text-muted text-uppercase small fw-bold mb-1">Duration</span>
+                <div class="duration-tag">
+                    <i class="fas fa-clock me-2 text-warning"></i> {{ tour.duration_days }} Days
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 d-grid gap-3">
+            {% if user.is_authenticated %}
+                
+                {% if user.is_staff %}
+                    <a href="{% url 'admin_edit_tour' tour.id %}" class="btn btn-dark btn-lg rounded-pill fw-bold shadow">
+                        <i class="fas fa-edit me-2"></i> Manage / Edit Tour
+                    </a>
+                {% else %}
+                    <a href="{% url 'book_tour' tour.id %}" class="btn btn-book">
+                        Book This Adventure <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                {% endif %}
+
+            {% else %}
+                <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-warning btn-lg rounded-pill fw-bold text-white shadow">
+                    Login to Book
+                </a>
+            {% endif %}
+            
+            <a href="{% url 'home' %}" class="btn btn-back text-center">
+                Back to Tours
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

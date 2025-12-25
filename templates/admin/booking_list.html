@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Booking Management</h2>
+    
+    <div class="row my-4 align-items-center">
+        <div class="col-md-7">
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link {% if not current_status %}active{% endif %}" href="{% url 'admin_booking_list' %}">All</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if current_status == 'pending' %}active{% endif %}" href="?status=pending">Pending</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if current_status == 'confirmed' %}active{% endif %}" href="?status=confirmed">Confirmed</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if current_status == 'cancelled' %}active{% endif %}" href="?status=cancelled">Cancelled</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-md-5">
+            <form method="get" class="d-flex">
+                {% if current_status %}
+                    <input type="hidden" name="status" value="{{ current_status }}">
+                {% endif %}
+                
+                <input type="text" name="q" class="form-control me-2" placeholder="Search user or tour..." value="{{ request.GET.q }}">
+                <button type="submit" class="btn btn-outline-dark">Search</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Tour Details</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>#{{ booking.id }}</td>
+                        <td>
+                            <strong>{{ booking.user.username }}</strong><br>
+                            <small class="text-muted">{{ booking.user.email }}</small>
+                        </td>
+                        <td>
+                            <strong>{{ booking.tour.name }}</strong><br>
+                            {{ booking.number_of_people }} People • ${{ booking.total_price }}<br>
+                            <small class="text-muted">{{ booking.booking_date|date:"M d, Y h:i A" }}</small>
+                        </td>
+                        <td>
+                            {% if booking.status == 'confirmed' %}
+                                <span class="badge bg-success">Confirmed</span>
+                            {% elif booking.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            {% else %}
+                                <span class="badge bg-danger">Cancelled</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if booking.status == 'pending' %}
+                                <a href="{% url 'approve_booking' booking.id %}" class="btn btn-sm btn-success">Approve</a>
+                                <a href="{% url 'admin_cancel_booking' booking.id %}" class="btn btn-sm btn-outline-danger">Reject</a>
+                            {% elif booking.status == 'confirmed' %}
+                                <a href="{% url 'admin_cancel_booking' booking.id %}" 
+                                   class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Are you sure you want to cancel this confirmed booking?');">
+                                   Force Cancel
+                                </a>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center py-4">No bookings found matching criteria.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="mt-3">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">&larr; Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    
+    <div class="d-flex align-items-center mb-4">
+        <div class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center shadow" style="width: 60px; height: 60px; margin-right: 15px;">
+            <i class="fas fa-user fa-lg"></i>
+        </div>
+        <div>
+            <h2 class="mb-0 fw-bold">Welcome, {{ user.username }}!</h2>
+            <p class="text-muted mb-0">Here is your travel history.</p>
+        </div>
+    </div>
+
+    <div class="card dashboard-card">
+        <div class="dashboard-header">
+            <h5><i class="fas fa-history me-2"></i> My Booking History</h5>
+            <span class="badge bg-light text-dark">{{ bookings.count }} Trips</span>
+        </div>
+        
+        <div class="card-body p-0"> {% if bookings %}
+                <div class="table-responsive">
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th style="padding-left: 30px;">Tour Details</th>
+                                <th>Travel Date</th>
+                                <th>People</th>
+                                <th>Total Price</th>
+                                <th>Status</th>
+                                <th class="text-end" style="padding-right: 30px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in bookings %}
+                            <tr>
+                                <td style="padding-left: 30px;">
+                                    <span class="history-tour-name">{{ booking.tour.name }}</span>
+                                    <small class="text-muted">Booked on: {{ booking.booking_date|date:"M d, Y" }}</small>
+                                </td>
+                                <td>
+                                    {% if booking.tour_date %}
+                                        <div class="history-date">
+                                            <i class="far fa-calendar-alt me-1"></i> {{ booking.tour_date.start_date|date:"M d, Y" }}
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted fst-italic">Open Ticket</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <i class="fas fa-user-friends text-muted me-1"></i> {{ booking.number_of_people }}
+                                </td>
+                                <td><strong>${{ booking.total_price }}</strong></td>
+                                <td>
+                                    {% if booking.status == 'confirmed' %}
+                                        <span class="status-badge status-confirmed">Confirmed</span>
+                                    {% elif booking.status == 'pending' %}
+                                        <span class="status-badge status-pending">Pending</span>
+                                    {% else %}
+                                        <span class="status-badge status-cancelled">Cancelled</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end" style="padding-right: 30px;">
+                                    {% if booking.status == 'pending' %}
+                                        <a href="{% url 'cancel_booking' booking.id %}" 
+                                           class="btn-cancel-small"
+                                           onclick="return confirm('Are you sure you want to cancel this booking?');">
+                                           <i class="fas fa-times me-1"></i> Cancel
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted small">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-suitcase-rolling fa-4x text-muted mb-3 opacity-50"></i>
+                    <h4 class="text-muted">No adventures booked yet.</h4>
+                    <p class="text-muted mb-4">Your next journey is just a click away.</p>
+                    <a href="{% url 'home' %}" class="btn btn-primary rounded-pill px-4">Browse Tours</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

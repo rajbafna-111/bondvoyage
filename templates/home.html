@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+</div> <div class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-3 mb-3">Your Next Adventure Awaits</h1>
+        <p class="lead mb-4">Discover tailored travel experiences with BondVoyage.</p>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form method="get" action="{% url 'home' %}" class="d-flex bg-white p-2 rounded-pill shadow-lg">
+                    <input type="text" name="q" class="form-control border-0 rounded-pill ps-4" 
+                           placeholder="Where do you want to go?" 
+                           value="{{ request.GET.q }}">
+                    <button class="btn btn-primary px-5 rounded-pill" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container"> <div class="row">
+    {% for tour in tours %}
+    <div class="col-md-4 mb-5">
+        <div class="card tour-card h-100 shadow-sm">
+            <div class="position-relative">
+                {% if tour.image %}
+                    <img src="{{ tour.image.url }}" class="card-img-top" alt="{{ tour.name }}">
+                {% else %}
+                    <div class="bg-secondary text-white d-flex justify-content-center align-items-center" style="height: 220px;">
+                        <i class="fas fa-image fa-3x"></i>
+                    </div>
+                {% endif %}
+                <div class="position-absolute top-0 end-0 m-3 bg-white text-dark px-3 py-1 rounded-pill fw-bold shadow-sm">
+                    ${{ tour.price }}
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <small class="text-muted"><i class="fas fa-map-marker-alt text-danger me-1"></i> {{ tour.location }}</small>
+                    <small class="text-muted"><i class="fas fa-clock text-primary me-1"></i> {{ tour.duration_days }} Days</small>
+                </div>
+                
+                <h5 class="card-title fw-bold">{{ tour.name }}</h5>
+                <p class="card-text text-muted">{{ tour.description|truncatewords:15 }}</p>
+            </div>
+            
+            <div class="card-footer bg-white border-0 pb-4 pt-0">
+                <a href="{% url 'tour_detail' tour.id %}" class="btn btn-outline-primary w-100 rounded-pill">View Itinerary</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <i class="fas fa-plane-slash fa-3x text-muted mb-3"></i>
+        <h3>No tours found matching your search.</h3>
+        <a href="{% url 'home' %}" class="btn btn-primary mt-3">View All Tours</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

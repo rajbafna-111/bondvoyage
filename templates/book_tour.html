@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center mt-5 mb-5">
+    <div class="col-md-5"> <div class="card booking-card">
+            
+            <div class="booking-header">
+                <h4><i class="fas fa-suitcase-rolling me-2"></i> Confirm Booking</h4>
+            </div>
+
+            <div class="booking-body">
+                <div class="booking-summary">
+                    <h5>{{ tour.name }}</h5>
+                    <p class="mb-0 text-muted">Price per person: <strong class="text-dark">${{ tour.price }}</strong></p>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger rounded-3 shadow-sm border-0">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-4">
+                        <label class="form-label-custom">Select Travel Date</label>
+                        {{ form.tour_date }}
+                        {% if form.tour_date.errors %}
+                            <div class="text-danger small mt-1">{{ form.tour_date.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label-custom">Number of People</label>
+                        {{ form.number_of_people }}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-confirm">
+                        Confirm & Pay <i class="fas fa-check-circle ms-2"></i>
+                    </button>
+                    
+                    <a href="{% url 'tour_detail' tour.id %}" class="btn-cancel-booking">
+                        Cancel
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

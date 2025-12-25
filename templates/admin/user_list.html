@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>User Directory</h2>
+    
+    <div class="row my-4 align-items-center">
+        <div class="col-md-6">
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link {% if not current_role %}active{% endif %}" href="{% url 'admin_user_list' %}">All Users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if current_role == 'customer' %}active{% endif %}" href="?role=customer">Customers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if current_role == 'admin' %}active{% endif %}" href="?role=admin">Admins</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-md-6">
+            <form method="get" class="d-flex">
+                {% if current_role %}
+                    <input type="hidden" name="role" value="{{ current_role }}">
+                {% endif %}
+                <input type="text" name="q" class="form-control me-2" placeholder="Search name, email, or phone..." value="{{ request.GET.q }}">
+                <button type="submit" class="btn btn-outline-dark">Search</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>User</th>
+                        <th>Contact Info</th>
+                        <th>Role</th>
+                        <th>Joined</th>
+                        <th>Activity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td>
+                            <strong>{{ u.username }}</strong><br>
+                            <small class="text-muted">{{ u.email }}</small>
+                        </td>
+                        <td>
+                            {% if u.phone_number %}
+                                📞 {{ u.phone_number }}<br>
+                            {% endif %}
+                            {% if u.address %}
+                                🏠 {{ u.address|truncatechars:30 }}
+                            {% else %}
+                                <span class="text-muted text-small">No address</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if u.role == 'admin' %}
+                                <span class="badge bg-danger">Admin</span>
+                            {% else %}
+                                <span class="badge bg-info text-dark">Customer</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ u.date_joined|date:"M d, Y" }}</td>
+                        <td>
+                            <span class="badge bg-secondary">{{ u.booking_set.count }} Bookings</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center py-4">No users found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">&larr; Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}
