@@ -4,10 +4,10 @@ from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm
 from bookings.models import Booking
 from django.db.models import Sum
-from django.contrib.admin.views.decorators import staff_member_required # Security Check
+from django.contrib.admin.views.decorators import staff_member_required 
 from tours.models import Tour
 from django.db.models import Q
-from django.contrib.auth import get_user_model # Best way to get CustomUser
+from django.contrib.auth import get_user_model 
 User = get_user_model()
 
 def register(request):
@@ -15,7 +15,7 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  # Log them in immediately after signing up
+            login(request, user)  
             return redirect('home')
     else:
         form = CustomUserCreationForm()
@@ -36,15 +36,15 @@ def admin_dashboard(request):
     
     # Status Counts
     pending_bookings = Booking.objects.filter(status='pending').count()
-    confirmed_bookings = Booking.objects.filter(status='confirmed').count() # <--- Added
-    cancelled_bookings = Booking.objects.filter(status='cancelled').count() # <--- Added
+    confirmed_bookings = Booking.objects.filter(status='confirmed').count() 
+    cancelled_bookings = Booking.objects.filter(status='cancelled').count() 
 
     context = {
         'total_bookings': total_bookings,
         'total_revenue': total_revenue,
         'pending_bookings': pending_bookings,
-        'confirmed_bookings': confirmed_bookings, # <--- Added to context
-        'cancelled_bookings': cancelled_bookings, # <--- Added to context
+        'confirmed_bookings': confirmed_bookings, 
+        'cancelled_bookings': cancelled_bookings, 
     }
     return render(request, 'admin_dashboard.html', context)
 

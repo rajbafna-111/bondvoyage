@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Sum # Import Sum at the top
+from django.db.models import Sum
 
 class Tour(models.Model):
     name = models.CharField(max_length=200)
@@ -7,11 +7,8 @@ class Tour(models.Model):
     location = models.CharField(max_length=100)
     duration_days = models.PositiveIntegerField(help_text="How many days is this tour?")
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    
-    # Images will be saved to media/tour_images/
     image = models.ImageField(upload_to='tour_images/', blank=True, null=True)
-    
-    is_active = models.BooleanField(default=True) # To hide tours without deleting them
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -28,7 +25,6 @@ class TourDate(models.Model):
     
     def __str__(self):
         # Calculate booked seats
-        # Note: Importing Booking inside the method prevents "Circular Import" errors
         from bookings.models import Booking 
         
         booked = Booking.objects.filter(

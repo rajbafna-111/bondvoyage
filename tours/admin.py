@@ -17,4 +17,4 @@ class TourAdmin(admin.ModelAdmin):
     # Search bar
     search_fields = ('name', 'location')
 
-    inlines = [TourDateInline] # <--- Add this line!
+    inlines = [TourDateInline]

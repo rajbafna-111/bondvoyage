@@ -1,6 +1,6 @@
 from django import forms
-from django.core.exceptions import ValidationError # <--- Import this
-from django.db.models import Sum # <--- Import this
+from django.core.exceptions import ValidationError 
+from django.db.models import Sum
 from .models import Booking
 from tours.models import TourDate
 

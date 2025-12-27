@@ -8,7 +8,7 @@ def home(request):
     # Start with all active tours
     tours = Tour.objects.filter(is_active=True)
     
-    # Check if there is a search query in the URL (e.g., /?q=paris)
+    # Check if there is a search query in the URL
     query = request.GET.get('q')
     
     if query:
@@ -21,7 +21,6 @@ def home(request):
     
     return render(request, 'home.html', {'tours': tours})
 
-# Add this new function
 def tour_detail(request, tour_id):
     tour = get_object_or_404(Tour, pk=tour_id)
     return render(request, 'tour_detail.html', {'tour': tour})
@@ -45,7 +44,7 @@ def admin_tour_list(request):
 @staff_member_required
 def admin_add_tour(request):
     if request.method == 'POST':
-        form = TourForm(request.POST, request.FILES) # request.FILES is needed for images
+        form = TourForm(request.POST, request.FILES) 
         if form.is_valid():
             form.save()
             return redirect('admin_tour_list')
@@ -58,7 +57,7 @@ def admin_add_tour(request):
 def admin_edit_tour(request, tour_id):
     tour = get_object_or_404(Tour, pk=tour_id)
     if request.method == 'POST':
-        form = TourForm(request.POST, request.FILES, instance=tour) # instance loads existing data
+        form = TourForm(request.POST, request.FILES, instance=tour)
         if form.is_valid():
             form.save()
             return redirect('admin_tour_list')

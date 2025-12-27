@@ -5,4 +5,4 @@ from .models import CustomUser
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'phone_number', 'address') # We don't include 'role' to prevent users from making themselves admins!
+        fields = ('username', 'email', 'phone_number', 'address')

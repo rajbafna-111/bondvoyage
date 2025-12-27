@@ -9,7 +9,7 @@ class Booking(models.Model):
         ('cancelled', 'Cancelled'),
     ]
 
-    # Link to the User (using settings.AUTH_USER_MODEL is best practice)
+    # Link to the User
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     
     # Link to the specific Tour

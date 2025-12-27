@@ -92,6 +92,9 @@ DATABASES = {
 # username: admin , password: admin
 # username: rajbafna111 , password: Star@1234
 
+# git add .
+# git commit -m "Updated code"
+
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
