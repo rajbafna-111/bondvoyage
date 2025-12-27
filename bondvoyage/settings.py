@@ -81,9 +81,9 @@ WSGI_APPLICATION = 'bondvoyage.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'bondvoyage_db',  # We will create this DB name in Postgres shortly
-        'USER': 'postgres',       # Default is usually 'postgres'
-        'PASSWORD': 'postgres', # <--- PUT YOUR PASSWORD HERE
+        'NAME': 'bondvoyage_db',  # My DB Name
+        'USER': 'postgres',       # My Username
+        'PASSWORD': 'postgres',
         'HOST': 'localhost',
         'PORT': '5432',
     }
