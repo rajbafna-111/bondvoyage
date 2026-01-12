@@ -51,7 +51,7 @@
                                 <td>
                                     <i class="fas fa-user-friends text-muted me-1"></i> {{ booking.number_of_people }}
                                 </td>
-                                <td><strong>${{ booking.total_price }}</strong></td>
+                                <td><strong>₹{{ booking.total_price }}</strong></td>
                                 <td>
                                     {% if booking.status == 'confirmed' %}
                                         <span class="status-badge status-confirmed">Confirmed</span>
