@@ -35,9 +35,9 @@ def admin_dashboard(request):
     total_revenue = Booking.objects.filter(status='confirmed').aggregate(Sum('total_price'))['total_price__sum'] or 0
     
     # Status Counts
-    pending_bookings = Booking.objects.filter(status='pending').count()
-    confirmed_bookings = Booking.objects.filter(status='confirmed').count() 
-    cancelled_bookings = Booking.objects.filter(status='cancelled').count() 
+    pending_bookings = Booking.objects.filter(status='Pending').count()
+    confirmed_bookings = Booking.objects.filter(status='Confirmed').count() 
+    cancelled_bookings = Booking.objects.filter(status='Cancelled').count() 
 
     context = {
         'total_bookings': total_bookings,

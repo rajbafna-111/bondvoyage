@@ -1,9 +1,11 @@
 from django.db import models
 from django.db.models import Sum
+from ckeditor.fields import RichTextField
 
 class Tour(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
+    itinerary = RichTextField(blank=True, null=True)
     location = models.CharField(max_length=100)
     duration_days = models.PositiveIntegerField(help_text="How many days is this tour?")
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -29,7 +31,7 @@ class TourDate(models.Model):
         
         booked = Booking.objects.filter(
             tour_date=self, 
-            status__in=['pending', 'confirmed']
+            status__in=['Pending', 'Confirmed']
         ).aggregate(Sum('number_of_people'))['number_of_people__sum'] or 0
         
         remaining = self.capacity - booked
@@ -38,3 +40,14 @@ class TourDate(models.Model):
             return f"{self.start_date.strftime('%d %b %Y')} (SOLD OUT)"
         else:
             return f"{self.start_date.strftime('%d %b %Y')} ({remaining} seats left)"
+        
+
+# tours/models.py
+
+class TourImage(models.Model):
+    # Link this image to a specific Tour
+    tour = models.ForeignKey(Tour, on_delete=models.CASCADE, related_name='gallery_images')
+    image = models.ImageField(upload_to='tour_gallery/')
+    
+    def __str__(self):
+        return f"Image for {self.tour.name}"

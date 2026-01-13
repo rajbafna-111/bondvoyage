@@ -4,9 +4,9 @@ from tours.models import *
 
 class Booking(models.Model):
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('confirmed', 'Confirmed'),
-        ('cancelled', 'Cancelled'),
+        ('Pending', 'Pending'),
+        ('Confirmed', 'Confirmed'),
+        ('Cancelled', 'Cancelled'),
     ]
 
     # Link to the User
@@ -19,8 +19,9 @@ class Booking(models.Model):
     
     number_of_people = models.PositiveIntegerField(default=1)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
     booking_date = models.DateTimeField(auto_now_add=True)
+    transaction_id = models.CharField(max_length=100, blank=True, null=True, help_text="Payment Reference ID")
 
     def save(self, *args, **kwargs):
         # Auto-calculate total price before saving

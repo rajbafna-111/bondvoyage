@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %} {% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white text-center">
+                    <h4><i class="fas fa-lock"></i> Secure Payment</h4>
+                </div>
+                <div class="card-body text-center">
+                    
+                    <h5 class="mb-3">{{ tour.name }}</h5>
+                    <p class="text-muted">You are paying for <strong>{{ booking_data.number_of_people }} people</strong></p>
+                    
+                    <h2 class="text-primary mb-4">₹{{ total_price }}</h2>
+                    
+                    <img src="{% static 'img/qr.png' %}" alt="Payment QR" class="img-fluid mb-4" style="width: 200px; border: 1px solid #ddd; padding: 5px;">
+                    
+                    <div class="alert alert-warning small">
+                        <i class="fas fa-info-circle"></i> Scan the QR code, make the payment, and enter the Reference ID below.
+                    </div>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-4 text-start">
+                            <label class="form-label fw-bold">Transaction / UPI Reference ID <span class="text-danger">*</span></label>
+                            
+                            <input type="text" 
+                                   name="transaction_id" 
+                                   class="form-control form-control-lg border-success" 
+                                   placeholder="e.g. UPI-12345678" 
+                                   required>
+                                   
+                            <div class="form-text">Your booking will not be created without this.</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 py-2 fw-bold">
+                            Submit & Create Booking <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

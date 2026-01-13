@@ -21,6 +21,8 @@ urlpatterns = [
     path('tour/<int:tour_id>/book/', book_tour, name='book_tour'), 
     path('booking/<int:booking_id>/cancel/', cancel_booking, name='cancel_booking'),
     path('booking/<int:booking_id>/approve/', approve_booking, name='approve_booking'),
+    path('payment/process/', payment_page, name='payment_page'),
+    path('booking/<int:booking_id>/ticket/', download_ticket, name='download_ticket'),
     
     #Dashboard
     path('dashboard/', dashboard, name='dashboard'),

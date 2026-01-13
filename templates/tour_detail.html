@@ -61,4 +61,34 @@
         </div>
     </div>
 </div>
+
+{% if tour.itinerary %}
+<div class="row mt-5">
+    <div class="col-12">
+        <h3 class="mb-3 border-start border-4 border-primary ps-3">Tour Itinerary</h3>
+        
+        <div class="itinerary-box p-4 border rounded shadow-sm bg-white">
+            {{ tour.itinerary|safe }}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if tour.gallery_images.exists %}
+<div class="row mt-5">
+    <div class="col-12">
+        <h3 class="mb-4 border-start border-4 border-warning ps-3">Tour Gallery</h3>
+        <div class="row g-3">
+            {% for photo in tour.gallery_images.all %}
+            <div class="col-md-4 col-sm-6">
+                <div class="card border-0 shadow-sm">
+                    <img src="{{ photo.image.url }}" class="card-img-top rounded" alt="Tour Photo" style="height: 250px; object-fit: cover;">
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}

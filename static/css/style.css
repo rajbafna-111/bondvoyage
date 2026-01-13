@@ -188,7 +188,17 @@ h1, h2, h3, h4, h5, .navbar-brand {
     color: #2d3436;
 }
 
+/* Ensure images inside the description/itinerary don't overflow on phone screens */
+.itinerary-box img, 
+.tour-description img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
 
+.itinerary-box ul, .itinerary-box ol {
+    padding-left: 20px; /* detailed lists look better with space */
+}
 
 
 
@@ -243,6 +253,7 @@ h1, h2, h3, h4, h5, .navbar-brand {
     margin-bottom: 8px;
     display: block;
 }
+
 
 /* Custom Input Styling */
 .form-control, .form-select {

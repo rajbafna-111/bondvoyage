@@ -11,13 +11,13 @@
                     <a class="nav-link {% if not current_status %}active{% endif %}" href="{% url 'admin_booking_list' %}">All</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if current_status == 'pending' %}active{% endif %}" href="?status=pending">Pending</a>
+                    <a class="nav-link {% if current_status == 'Pending' %}active{% endif %}" href="?status=Pending">Pending</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if current_status == 'confirmed' %}active{% endif %}" href="?status=confirmed">Confirmed</a>
+                    <a class="nav-link {% if current_status == 'Confirmed' %}active{% endif %}" href="?status=Confirmed">Confirmed</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if current_status == 'cancelled' %}active{% endif %}" href="?status=cancelled">Cancelled</a>
+                    <a class="nav-link {% if current_status == 'Cancelled' %}active{% endif %}" href="?status=Cancelled">Cancelled</a>
                 </li>
             </ul>
         </div>
@@ -44,6 +44,7 @@
                         <th>Tour Details</th>
                         <th>Status</th>
                         <th>Action</th>
+                        <th>Transaction ID</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -60,19 +61,20 @@
                             <small class="text-muted">{{ booking.booking_date|date:"M d, Y h:i A" }}</small>
                         </td>
                         <td>
-                            {% if booking.status == 'confirmed' %}
+                            {% if booking.status == 'Confirmed' %}
                                 <span class="badge bg-success">Confirmed</span>
-                            {% elif booking.status == 'pending' %}
+                            {% elif booking.status == 'Pending' %}
                                 <span class="badge bg-warning text-dark">Pending</span>
                             {% else %}
                                 <span class="badge bg-danger">Cancelled</span>
                             {% endif %}
                         </td>
                         <td>
-                            {% if booking.status == 'pending' %}
+                            {% if booking.status == 'Pending' %}
                                 <a href="{% url 'approve_booking' booking.id %}" class="btn btn-sm btn-success">Approve</a>
                                 <a href="{% url 'admin_cancel_booking' booking.id %}" class="btn btn-sm btn-outline-danger">Reject</a>
-                            {% elif booking.status == 'confirmed' %}
+                            
+                            {% elif booking.status == 'Confirmed' %}
                                 <a href="{% url 'admin_cancel_booking' booking.id %}" 
                                    class="btn btn-sm btn-danger"
                                    onclick="return confirm('Are you sure you want to cancel this confirmed booking?');">
@@ -82,9 +84,16 @@
                                 <span class="text-muted">-</span>
                             {% endif %}
                         </td>
+                        <td>
+                            {% if booking.transaction_id %}
+                                <span class="badge bg-info text-dark">{{ booking.transaction_id }}</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Not Paid</span>
+                            {% endif %}
+                        </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="5" class="text-center py-4">No bookings found matching criteria.</td></tr>
+                    <tr><td colspan="6" class="text-center py-4">No bookings found matching criteria.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

@@ -3,7 +3,7 @@ from .models import Booking
 
 # Define the action function
 def mark_confirmed(modeladmin, request, queryset):
-    queryset.update(status='confirmed')
+    queryset.update(status='Confirmed')
 mark_confirmed.short_description = "Mark selected bookings as Confirmed"
 
 @admin.register(Booking)

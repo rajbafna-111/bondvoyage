@@ -4,7 +4,7 @@ from .models import Tour
 class TourForm(forms.ModelForm):
     class Meta:
         model = Tour
-        fields = ['name', 'location', 'description', 'duration_days', 'price', 'image', 'is_active']
+        fields = ['name', 'location', 'description', 'itinerary', 'duration_days', 'price', 'image', 'is_active']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'location': forms.TextInput(attrs={'class': 'form-control'}),

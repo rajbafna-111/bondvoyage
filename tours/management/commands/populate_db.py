@@ -82,7 +82,7 @@ class Command(BaseCommand):
                                 tour_date=tour_date,
                                 number_of_people=people,
                                 total_price=tour.price * people,
-                                status=random.choice(['pending', 'confirmed', 'cancelled'])
+                                status=random.choice(['Pending', 'Confirmed', 'Cancelled'])
                             )
 
             self.stdout.write(self.style.SUCCESS("Success! Database populated."))
