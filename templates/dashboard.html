@@ -19,7 +19,8 @@
             <span class="badge bg-light text-dark">{{ bookings.count }} Trips</span>
         </div>
         
-        <div class="card-body p-0"> {% if bookings %}
+        <div class="card-body p-0"> 
+            {% if bookings %}
                 <div class="table-responsive">
                     <table class="table custom-table">
                         <thead>
@@ -38,8 +39,9 @@
                             <tr>
                                 <td style="padding-left: 30px;">
                                     <span class="history-tour-name">{{ booking.tour.name }}</span>
-                                    <small class="text-muted">Booked on: {{ booking.booking_date|date:"M d, Y" }}</small>
+                                    <small class="text-muted d-block">Booked on: {{ booking.booking_date|date:"M d, Y" }}</small>
                                 </td>
+
                                 <td>
                                     {% if booking.tour_date %}
                                         <div class="history-date">
@@ -49,44 +51,42 @@
                                         <span class="text-muted fst-italic">Open Ticket</span>
                                     {% endif %}
                                 </td>
+
                                 <td>
                                     <i class="fas fa-user-friends text-muted me-1"></i> {{ booking.number_of_people }}
                                 </td>
+
                                 <td><strong>₹{{ booking.total_price }}</strong></td>
+
                                 <td>
                                     {% if booking.status == 'Confirmed' %}
                                         <span class="badge bg-success">Confirmed</span>
-                                        
                                     {% elif booking.status == 'Pending' %}
-                                        <span class="badge bg-warning text-dark">Pending Approval</span>
-                                        
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    {% elif booking.status == 'Completed' %}
+                                        <span class="badge bg-primary">Completed</span>
                                     {% else %}
                                         <span class="badge bg-danger">Cancelled</span>
                                     {% endif %}
                                 </td>
+
                                 <td class="text-end" style="padding-right: 30px;">
-                                    {% if booking.status == 'Pending' %}
-                                        <a href="{% url 'cancel_booking' booking.id %}" 
-                                           class="btn-cancel-small"
-                                           onclick="return confirm('Are you sure you want to cancel this booking?');">
-                                           <i class="fas fa-times me-1"></i> Cancel
-                                        </a>
+                                    {% if booking.status == 'Confirmed' or booking.status == 'Pending' %}
+                                        <small class="text-muted" style="font-size: 0.85rem;">
+                                            To cancel, contact<br>support@bondvoyage.com
+                                        </small>
                                     {% else %}
                                         <span class="text-muted small">-</span>
                                     {% endif %}
                                 </td>
+
                                 <td>
-                                    {% if booking.status == 'Confirmed' %}
-                                        <span class="badge bg-success">Confirmed</span>
-                                        
-                                        <a href="{% url 'download_ticket' booking.id %}" class="btn btn-sm btn-outline-dark mt-1">
+                                    {% if booking.status == 'Confirmed' or booking.status == 'Completed' %}
+                                        <a href="{% url 'download_ticket' booking.id %}" class="btn btn-sm btn-outline-dark">
                                             <i class="fas fa-file-pdf"></i> Ticket
                                         </a>
-                                        
-                                    {% elif booking.status == 'Pending' %}
-                                        <span class="badge bg-warning text-dark">Pending</span>
                                     {% else %}
-                                        <span class="badge bg-danger">Cancelled</span>
+                                        <span class="text-muted small">Not Available</span>
                                     {% endif %}
                                 </td>
                             </tr>

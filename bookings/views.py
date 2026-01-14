@@ -1,13 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from tours.models import Tour
-from .models import Booking, Tour, TourDate
-from .forms import BookingForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
 from django.contrib import messages
-from .utils import render_to_pdf 
 from django.http import HttpResponse
+from datetime import datetime, timedelta
+
+# Models & Forms
+from tours.models import Tour, TourDate
+from .models import Booking
+from .forms import BookingForm
+from .utils import render_to_pdf 
 
 # --- BOOKING STEP 1: FILL FORM (No DB Save yet) ---
 @login_required
@@ -19,7 +22,7 @@ def book_tour(request, tour_id):
         if form.is_valid():
             data = form.cleaned_data
             
-            # Save to Session
+            # Save data to Session (Temporary storage)
             request.session['booking_data'] = {
                 'tour_id': tour.id,
                 'tour_date_id': data['tour_date'].id,
@@ -32,75 +35,6 @@ def book_tour(request, tour_id):
         form = BookingForm(tour=tour)
 
     return render(request, 'book_tour.html', {'form': form, 'tour': tour})
-
-
-# --- USER CANCELLATION ---
-@login_required
-def cancel_booking(request, booking_id):
-    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
-    
-    # FIX 1: Check for 'Pending' (Capital P)
-    if booking.status == 'Pending':
-        # FIX 2: Set to 'Cancelled' (Capital C)
-        booking.status = 'Cancelled'
-        booking.save()
-        messages.success(request, "Your booking has been cancelled.")
-    
-    return redirect('dashboard')
-
-
-# --- ADMIN: MANAGE ALL BOOKINGS ---
-@staff_member_required
-def admin_booking_list(request):
-    bookings = Booking.objects.all().order_by('-booking_date')
-    
-    # 1. FILTERING (Tabs)
-    status_filter = request.GET.get('status')
-    
-    if status_filter:
-        # FIX 3: Convert URL param (e.g., 'pending') to DB format ('Pending')
-        # .capitalize() turns "pending" -> "Pending"
-        db_status = status_filter.capitalize()
-        bookings = bookings.filter(status=db_status)
-        
-    # 2. SEARCHING
-    query = request.GET.get('q')
-    if query:
-        bookings = bookings.filter(
-            Q(user__username__icontains=query) |
-            Q(tour__name__icontains=query) |
-            Q(transaction_id__icontains=query) # Added searching by Transaction ID too!
-        )
-
-    context = {
-        'bookings': bookings,
-        'current_status': status_filter, 
-    }
-    return render(request, 'admin/booking_list.html', context)
-
-
-# --- ADMIN: APPROVE BOOKING ---
-@staff_member_required
-def approve_booking(request, booking_id):
-    booking = get_object_or_404(Booking, id=booking_id)
-    
-    # FIX 4: Set to 'Confirmed' (Capital C)
-    booking.status = 'Confirmed'
-    booking.save()
-    messages.success(request, "Booking Confirmed!")
-    return redirect('admin_booking_list')
-
-
-# --- ADMIN: REJECT/CANCEL BOOKING ---
-@staff_member_required
-def admin_cancel_booking(request, booking_id):
-    booking = get_object_or_404(Booking, id=booking_id)
-    
-    # FIX 5: Set to 'Cancelled' (Capital C)
-    booking.status = 'Cancelled'
-    booking.save()
-    messages.success(request, "Booking Cancelled.")
-    return redirect('admin_booking_list')
 
 
 # --- BOOKING STEP 2: PAYMENT & CREATE DB RECORD ---
@@ -121,7 +55,8 @@ def payment_page(request):
         if transaction_id:
             tour_date = get_object_or_404(TourDate, id=booking_data['tour_date_id'])
             
-            # Create the actual booking now
+            # Create the actual booking 
+            # Note: status defaults to 'Pending' and payment_status to 'Pending' based on your model
             Booking.objects.create(
                 user=request.user,
                 tour=tour,
@@ -129,12 +64,12 @@ def payment_page(request):
                 number_of_people=booking_data['number_of_people'],
                 total_price=total_price,
                 transaction_id=transaction_id,
-                status='Pending' # Correct (Capital P)
             )
             
+            # Clear the session
             del request.session['booking_data']
             
-            messages.success(request, "Payment Submitted! Booking Created Successfully.")
+            messages.success(request, "Payment Submitted! Please wait for Admin Verification.")
             return redirect('dashboard')
         else:
             messages.error(request, "Transaction ID is mandatory!")
@@ -147,12 +82,83 @@ def payment_page(request):
     return render(request, 'payment.html', context)
 
 
+# --- ADMIN: MANAGE ALL BOOKINGS ---
+@staff_member_required
+def admin_booking_list(request):
+    bookings = Booking.objects.all().order_by('-booking_date')
+    
+    # --- FILTERS ---
+    status_filter = request.GET.get('status')
+    query = request.GET.get('q')
+    start_date = request.GET.get('start_date') # <--- NEW
+    end_date = request.GET.get('end_date')     # <--- NEW
+
+    # 1. Apply Status Filter
+    if status_filter:
+        bookings = bookings.filter(status=status_filter)
+
+    # 2. Apply Search
+    if query:
+        bookings = bookings.filter(
+            user__username__icontains=query
+        ) | bookings.filter(
+            tour__name__icontains=query
+        ) | bookings.filter(id__icontains=query)
+
+    # 3. Apply Date Filter (NEW CODE)
+    if start_date:
+        bookings = bookings.filter(booking_date__date__gte=start_date)
+    if end_date:
+        bookings = bookings.filter(booking_date__date__lte=end_date)
+
+    context = {
+        'bookings': bookings,
+        'current_status': status_filter,
+        'start_date': start_date, # Pass back to template so inputs don't clear
+        'end_date': end_date,     # Pass back to template
+    }
+    return render(request, 'admin/booking_list.html', context)
+
+
+# --- NEW: UNIFIED ADMIN ACTION VIEW ---
+@staff_member_required
+def admin_update_booking_status(request, booking_id, action):
+    booking = get_object_or_404(Booking, id=booking_id)
+
+    # --- PHASE 1: INITIAL VERIFICATION ---
+    if action == 'verify_payment':
+        booking.status = 'Confirmed'
+        booking.payment_status = 'Paid'
+        messages.success(request, f"Booking #{booking.id} verified and confirmed!")
+        
+    elif action == 'reject_payment':
+        booking.status = 'Cancelled'
+        booking.payment_status = 'Rejected'
+        messages.warning(request, f"Payment for Booking #{booking.id} rejected.")
+
+    # --- PHASE 2: POST-CONFIRMATION ACTIONS ---
+    elif action == 'mark_completed':
+        booking.status = 'Completed'
+        # Payment status remains 'Paid'
+        messages.success(request, f"Tour #{booking.id} marked as Completed!")
+        
+    elif action == 'refund_cancel':
+        booking.status = 'Cancelled'
+        booking.payment_status = 'Refunded'
+        messages.info(request, f"Booking #{booking.id} cancelled and marked as Refunded.")
+
+    booking.save()
+    
+    # Return to the booking list
+    return redirect('admin_booking_list')
+
+
+# --- TICKET DOWNLOAD ---
 @login_required
 def download_ticket(request, booking_id):
-    # Get the booking, ensure it belongs to the user (or is staff)
     booking = get_object_or_404(Booking, id=booking_id)
     
-    # Security: Only allow Owner or Staff to view
+    # Security: Only allow Owner or Staff
     if request.user != booking.user and not request.user.is_staff:
         return HttpResponse("You are not authorized to view this ticket.", status=403)
     
@@ -166,10 +172,8 @@ def download_ticket(request, booking_id):
         'user': booking.user,
     }
     
-    # Render the PDF
     pdf = render_to_pdf('ticket_pdf.html', data)
     
-    # Force download (optional: remove 'attachment;' to view in browser instead)
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = f"Ticket_{booking.id}_{booking.tour.name}.pdf"
@@ -178,3 +182,48 @@ def download_ticket(request, booking_id):
         return response
         
     return HttpResponse("Error Rendering PDF", status=400)
+
+
+from django.db.models import Sum
+
+@staff_member_required
+def admin_payment_report(request):
+    payments = Booking.objects.all().order_by('-booking_date')
+
+    # --- FILTERS ---
+    status_filter = request.GET.get('status')
+    start_date = request.GET.get('start_date') # <--- NEW
+    end_date = request.GET.get('end_date')     # <--- NEW
+    query = request.GET.get('q')
+
+    # 1. Apply Status Filter
+    if status_filter:
+        payments = payments.filter(payment_status=status_filter)
+
+    # 2. Apply Date Filter (NEW CODE)
+    if start_date:
+        payments = payments.filter(booking_date__date__gte=start_date)
+    if end_date:
+        payments = payments.filter(booking_date__date__lte=end_date)
+
+    # 3. Apply Text Search
+    if query:
+        payments = payments.filter(
+            user__username__icontains=query
+        ) | payments.filter(
+            transaction_id__icontains=query
+        ) | payments.filter(id__icontains=query)
+
+    # 4. Calculate Totals (AFTER filtering)
+    total_revenue = Booking.objects.filter(payment_status='Paid').aggregate(Sum('total_price'))['total_price__sum'] or 0
+    report_total = payments.aggregate(Sum('total_price'))['total_price__sum'] or 0
+
+    context = {
+        'payments': payments,
+        'total_revenue': total_revenue,
+        'report_total': report_total,
+        'current_status': status_filter,
+        'start_date': start_date, 
+        'end_date': end_date,     
+    }
+    return render(request, 'admin/payment_report.html', context)

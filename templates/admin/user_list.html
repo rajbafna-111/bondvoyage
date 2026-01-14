@@ -59,13 +59,15 @@
                                 <span class="text-muted text-small">No address</span>
                             {% endif %}
                         </td>
+                        
                         <td>
-                            {% if u.role == 'admin' %}
+                            {% if u.is_staff %}
                                 <span class="badge bg-danger">Admin</span>
                             {% else %}
                                 <span class="badge bg-info text-dark">Customer</span>
                             {% endif %}
                         </td>
+
                         <td>{{ u.date_joined|date:"M d, Y" }}</td>
                         <td>
                             <span class="badge bg-secondary">{{ u.booking_set.count }} Bookings</span>

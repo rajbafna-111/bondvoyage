@@ -50,24 +50,72 @@ def admin_dashboard(request):
 
 @staff_member_required
 def admin_user_list(request):
+    # 1. Get the correct User model (Best Practice)
+    User = get_user_model() 
+
+    # 2. Get all users
     users = User.objects.all().order_by('-date_joined')
     
-    # 1. FILTER BY ROLE
+    # 3. Check for filters
     role_filter = request.GET.get('role')
-    if role_filter:
-        users = users.filter(role=role_filter)
-        
-    # 2. SEARCH (Username, Email, or Phone)
     query = request.GET.get('q')
+
+    # 4. Apply Role Filter (Using is_staff)
+    if role_filter == 'admin':
+        users = users.filter(is_staff=True)
+    elif role_filter == 'customer':
+        users = users.filter(is_staff=False)
+
+    # 5. Apply Search
     if query:
-        users = users.filter(
-            Q(username__icontains=query) |
-            Q(email__icontains=query) |
-            Q(phone_number__icontains=query)
-        )
+        users = users.filter(username__icontains=query) | users.filter(email__icontains=query)
 
     context = {
         'users': users,
-        'current_role': role_filter,
+        'current_role': role_filter
     }
     return render(request, 'admin/user_list.html', context)
+
+
+from django.db.models import Sum
+
+@staff_member_required
+def admin_dashboard(request):
+    bookings = Booking.objects.all()
+    
+    # --- 1. BOOKING COUNTS ---
+    stats = {
+        'total_bookings': bookings.count(),
+        'confirmed_bookings': bookings.filter(status='Confirmed').count(),
+        'pending_bookings': bookings.filter(status='Pending').count(),
+        'cancelled_bookings': bookings.filter(status='Cancelled').count(),
+        'completed_bookings': bookings.filter(status='Completed').count(), # New
+    }
+
+    # --- 2. REVENUE CALCULATIONS ---
+    # Total Realized Revenue (Only 'Paid' payments)
+    revenue = bookings.filter(payment_status='Paid').aggregate(Sum('total_price'))['total_price__sum'] or 0
+    
+    # Pending Payments (Money stuck in limbo)
+    pending_pay_amt = bookings.filter(payment_status='Pending').aggregate(Sum('total_price'))['total_price__sum'] or 0
+    pending_pay_cnt = bookings.filter(payment_status='Pending').count()
+    
+    # Refunded (Money sent back)
+    refunded_pay_amt = bookings.filter(payment_status='Refunded').aggregate(Sum('total_price'))['total_price__sum'] or 0
+    refunded_pay_cnt = bookings.filter(payment_status='Refunded').count()
+
+    # Rejected (Money blocked)
+    rejected_pay_amt = bookings.filter(payment_status='Rejected').aggregate(Sum('total_price'))['total_price__sum'] or 0
+    rejected_pay_cnt = bookings.filter(payment_status='Rejected').count()
+
+    context = {
+        **stats, # Unpack booking stats
+        'total_revenue': revenue,
+        'pending_pay_amt': pending_pay_amt,
+        'pending_pay_cnt': pending_pay_cnt,
+        'refunded_pay_amt': refunded_pay_amt,
+        'refunded_pay_cnt': refunded_pay_cnt,
+        'rejected_pay_amt': rejected_pay_amt,
+        'rejected_pay_cnt': rejected_pay_cnt,
+    }
+    return render(request, 'admin_dashboard.html', context)

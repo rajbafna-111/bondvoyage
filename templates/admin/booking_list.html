@@ -2,35 +2,57 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Booking Management</h2>
     
-    <div class="row my-4 align-items-center">
-        <div class="col-md-7">
-            <ul class="nav nav-pills">
-                <li class="nav-item">
-                    <a class="nav-link {% if not current_status %}active{% endif %}" href="{% url 'admin_booking_list' %}">All</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if current_status == 'Pending' %}active{% endif %}" href="?status=Pending">Pending</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if current_status == 'Confirmed' %}active{% endif %}" href="?status=Confirmed">Confirmed</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if current_status == 'Cancelled' %}active{% endif %}" href="?status=Cancelled">Cancelled</a>
-                </li>
-            </ul>
-        </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Booking Management</h2>
+        <span class="badge bg-dark rounded-pill px-3 py-2 fs-6">
+            <i class="fas fa-list me-1"></i> {{ bookings.count }} Bookings
+        </span>
+    </div>
 
-        <div class="col-md-5">
-            <form method="get" class="d-flex">
-                {% if current_status %}
-                    <input type="hidden" name="status" value="{{ current_status }}">
-                {% endif %}
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-2">
+            <div class="d-flex justify-content-between align-items-center flex-nowrap gap-3" style="overflow-x: auto;">
                 
-                <input type="text" name="q" class="form-control me-2" placeholder="Search user or tour..." value="{{ request.GET.q }}">
-                <button type="submit" class="btn btn-outline-dark">Search</button>
-            </form>
+                <div class="btn-group flex-shrink-0" role="group">
+                    <a href="{% url 'admin_booking_list' %}" class="btn btn-outline-secondary {% if not current_status %}active{% endif %}">All</a>
+                    <a href="?status=Pending" class="btn btn-outline-warning {% if current_status == 'Pending' %}active{% endif %}">Pending</a>
+                    <a href="?status=Confirmed" class="btn btn-outline-success {% if current_status == 'Confirmed' %}active{% endif %}">Confirmed</a>
+                    <a href="?status=Completed" class="btn btn-outline-primary {% if current_status == 'Completed' %}active{% endif %}">Completed</a>
+                    <a href="?status=Cancelled" class="btn btn-outline-danger {% if current_status == 'Cancelled' %}active{% endif %}">Cancelled</a>
+                </div>
+
+                <form method="get" class="d-flex gap-2 align-items-center m-0 flex-nowrap flex-grow-1 justify-content-end">
+                    {% if current_status %}
+                        <input type="hidden" name="status" value="{{ current_status }}">
+                    {% endif %}
+
+                    <div class="input-group input-group-sm" style="width: 150px;">
+                        <span class="input-group-text bg-light border-secondary text-secondary"><i class="fas fa-calendar-alt"></i></span>
+                        <input type="date" name="start_date" class="form-control border-secondary" value="{{ start_date }}" title="Start Date">
+                    </div>
+
+                    <div class="input-group input-group-sm" style="width: 150px;">
+                        <span class="input-group-text bg-light border-secondary text-secondary"><i class="fas fa-arrow-right"></i></span>
+                        <input type="date" name="end_date" class="form-control border-secondary" value="{{ end_date }}" title="End Date">
+                    </div>
+
+                    <div class="input-group input-group-sm" style="min-width: 100px; flex-grow: 1; max-width: 200px;">
+                        <input type="text" name="q" class="form-control border-secondary rounded" placeholder="Search..." value="{{ request.GET.q }}">
+                    </div>
+                    
+                    <div class="d-flex gap-2 flex-shrink-0">
+                        <button type="submit" class="btn btn-dark btn-sm rounded px-3" title="Apply Filters">
+                            <i class="fas fa-search"></i>
+                        </button>
+
+                        <a href="{% url 'admin_booking_list' %}" class="btn btn-outline-danger btn-sm rounded px-3" title="Reset All Filters">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </div>
+                </form>
+
+            </div>
         </div>
     </div>
 
@@ -43,7 +65,7 @@
                         <th>User</th>
                         <th>Tour Details</th>
                         <th>Status</th>
-                        <th>Action</th>
+                        <th style="min-width: 220px;">Action</th>
                         <th>Transaction ID</th>
                     </tr>
                 </thead>
@@ -60,30 +82,61 @@
                             {{ booking.number_of_people }} People • ₹{{ booking.total_price }}<br>
                             <small class="text-muted">{{ booking.booking_date|date:"M d, Y h:i A" }}</small>
                         </td>
+                        
                         <td>
                             {% if booking.status == 'Confirmed' %}
                                 <span class="badge bg-success">Confirmed</span>
                             {% elif booking.status == 'Pending' %}
                                 <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif booking.status == 'Completed' %}
+                                <span class="badge bg-primary">Completed</span>
                             {% else %}
                                 <span class="badge bg-danger">Cancelled</span>
                             {% endif %}
                         </td>
+                        
                         <td>
                             {% if booking.status == 'Pending' %}
-                                <a href="{% url 'approve_booking' booking.id %}" class="btn btn-sm btn-success">Approve</a>
-                                <a href="{% url 'admin_cancel_booking' booking.id %}" class="btn btn-sm btn-outline-danger">Reject</a>
-                            
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'admin_booking_action' booking.id 'verify_payment' %}" 
+                                       class="btn btn-sm btn-success rounded-pill d-flex align-items-center justify-content-center" 
+                                       style="width: 95px; height: 35px;"
+                                       title="Verify Payment">
+                                       <i class="fas fa-check me-1"></i> Verify
+                                    </a>
+                                    
+                                    <a href="{% url 'admin_booking_action' booking.id 'reject_payment' %}" 
+                                       class="btn btn-sm btn-danger rounded-pill d-flex align-items-center justify-content-center" 
+                                       style="width: 95px; height: 35px;"
+                                       title="Reject Payment"
+                                       onclick="return confirm('Are you sure you want to REJECT this payment?');">
+                                       <i class="fas fa-times me-1"></i> Reject
+                                    </a>
+                                </div>
+
                             {% elif booking.status == 'Confirmed' %}
-                                <a href="{% url 'admin_cancel_booking' booking.id %}" 
-                                   class="btn btn-sm btn-danger"
-                                   onclick="return confirm('Are you sure you want to cancel this confirmed booking?');">
-                                   Force Cancel
-                                </a>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'admin_booking_action' booking.id 'mark_completed' %}" 
+                                       class="btn btn-sm btn-primary rounded-pill d-flex align-items-center justify-content-center"
+                                       style="width: 95px; height: 35px;"
+                                       title="Mark Completed">
+                                       <i class="fas fa-flag-checkered me-1"></i> Done
+                                    </a>
+
+                                    <a href="{% url 'admin_booking_action' booking.id 'refund_cancel' %}" 
+                                       class="btn btn-sm btn-warning text-dark rounded-pill d-flex align-items-center justify-content-center"
+                                       style="width: 95px; height: 35px;"
+                                       title="Refund & Cancel"
+                                       onclick="return confirm('Refund and Cancel?');">
+                                       <i class="fas fa-undo me-1"></i> Refund
+                                    </a>
+                                </div>
+
                             {% else %}
-                                <span class="text-muted">-</span>
+                                <span class="text-muted small">--</span>
                             {% endif %}
                         </td>
+                        
                         <td>
                             {% if booking.transaction_id %}
                                 <span class="badge bg-info text-dark">{{ booking.transaction_id }}</span>

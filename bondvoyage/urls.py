@@ -8,9 +8,6 @@ from users.views import *
 from bookings.views import *
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', home, name='home'),
-    
     # Authentication URLs
     path('register/', register, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
@@ -19,8 +16,7 @@ urlpatterns = [
     # Booking System
     path('tour/<int:tour_id>/', tour_detail, name='tour_detail'),
     path('tour/<int:tour_id>/book/', book_tour, name='book_tour'), 
-    path('booking/<int:booking_id>/cancel/', cancel_booking, name='cancel_booking'),
-    path('booking/<int:booking_id>/approve/', approve_booking, name='approve_booking'),
+    path('admin/booking/<int:booking_id>/<str:action>/', admin_update_booking_status, name='admin_booking_action'),
     path('payment/process/', payment_page, name='payment_page'),
     path('booking/<int:booking_id>/ticket/', download_ticket, name='download_ticket'),
     
@@ -36,8 +32,11 @@ urlpatterns = [
     
     # Admin Booking Management
     path('admin-panel/bookings/', admin_booking_list, name='admin_booking_list'),
-    path('admin-panel/bookings/cancel/<int:booking_id>/', admin_cancel_booking, name='admin_cancel_booking'),
     path('admin-panel/users/', admin_user_list, name='admin_user_list'),
+    path('admin-panel/payments/', admin_payment_report, name='admin_payment_report'),
+
+    path('admin/', admin.site.urls),
+    path('', home, name='home'),
 ]
 
 # to show up image
