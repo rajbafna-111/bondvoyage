@@ -1,31 +1,194 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row justify-content-center mt-4">
-    <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h4>{{ title }}</h4>
-            </div>
-            <div class="card-body">
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form.media }}
-                    {% for field in form %}
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}
-                            <div class="text-danger small">{{ field.errors }}</div>
-                        {% endif %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="m-0"><i class="fas fa-globe-asia me-2"></i>{{ title }}</h4>
                     </div>
-                    {% endfor %}
-                    
-                    <button type="submit" class="btn btn-success">Save Package</button>
-                    <a href="{% url 'admin_tour_list' %}" class="btn btn-secondary">Cancel</a>
-                </form>
-            </div>
+                    <div class="card-body">
+                        {{ form.media }}
+                        <div class="row">
+                            {% for field in form %}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger small">{{ field.errors }}</div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="m-0"><i class="fas fa-calendar-alt me-2"></i>Available Dates & Capacity</h5>
+                    </div>
+                    <div class="card-body">
+                        {{ date_formset.management_form }}
+                        
+                        <div id="date-form-list">
+                            {% for form in date_formset %}
+                                <div class="row mb-2 align-items-center form-row-item date-form-row">
+                                    {{ form.id }}
+                                    <div class="col-md-4">
+                                        <label class="small text-muted">Start Date</label>
+                                        {{ form.start_date }} 
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="small text-muted">Capacity</label>
+                                        {{ form.capacity }}
+                                    </div>
+                                    <div class="col-md-3 text-end">
+                                        {% if date_formset.can_delete %}
+                                            <div class="d-none">{{ form.DELETE }}</div>
+                                            <button type="button" class="btn btn-outline-danger btn-sm mt-4 delete-row-btn">
+                                                <i class="fas fa-trash-alt"></i> Remove
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div id="empty-date-form" style="display:none;">
+                            <div class="row mb-2 align-items-center form-row-item date-form-row">
+                                <div class="col-md-4">
+                                    <label class="small text-muted">Start Date (DD-MM-YYYY)</label> {{ form.start_date }} 
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="small text-muted">Capacity</label>
+                                    {{ date_formset.empty_form.capacity }}
+                                </div>
+                                <div class="col-md-3 text-end">
+                                    <div class="d-none">{{ date_formset.empty_form.DELETE }}</div>
+                                    <button type="button" class="btn btn-outline-danger btn-sm mt-4 delete-row-btn">
+                                        <i class="fas fa-trash-alt"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" id="add-date-btn" class="btn btn-sm btn-outline-dark mt-2">
+                            <i class="fas fa-plus"></i> Add Another Date
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="m-0"><i class="fas fa-images me-2"></i>Photo Gallery</h5>
+                    </div>
+                    <div class="card-body">
+                        {{ image_formset.management_form }}
+                        
+                        <div id="image-form-list" class="row">
+                            {% for form in image_formset %}
+                                <div class="col-md-4 mb-3 form-row-item image-form-row">
+                                    <div class="border p-2 rounded text-center h-100 position-relative">
+                                        {{ form.id }}
+                                        {% if form.instance.image %}
+                                            <div class="mb-2">
+                                                <img src="{{ form.instance.image.url }}" class="img-thumbnail" style="height: 100px;">
+                                            </div>
+                                        {% endif %}
+                                        {{ form.image }}
+                                        
+                                        {% if image_formset.can_delete %}
+                                            <div class="d-none">{{ form.DELETE }}</div>
+                                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 delete-row-btn" title="Remove Photo">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div id="empty-image-form" style="display:none;">
+                            <div class="col-md-4 mb-3 form-row-item image-form-row">
+                                <div class="border p-2 rounded text-center h-100 position-relative">
+                                    {{ image_formset.empty_form.image }}
+                                    <div class="d-none">{{ image_formset.empty_form.DELETE }}</div>
+                                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 delete-row-btn">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" id="add-image-btn" class="btn btn-sm btn-outline-dark mt-2">
+                            <i class="fas fa-plus"></i> Add Another Photo
+                        </button>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mb-5">
+                    <button type="submit" class="btn btn-success btn-lg px-5">Save Package</button>
+                    <a href="{% url 'admin_tour_list' %}" class="btn btn-secondary btn-lg">Cancel</a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // 1. ADD ROW FUNCTION
+        function addForm(btnId, formListId, emptyFormId, prefix) {
+            const btn = document.getElementById(btnId);
+            const list = document.getElementById(formListId);
+            const emptyForm = document.getElementById(emptyFormId).innerHTML;
+            const totalForms = document.getElementById(`id_${prefix}-TOTAL_FORMS`);
+
+            if (btn) {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    let count = parseInt(totalForms.value);
+                    const newFormHtml = emptyForm.replace(/__prefix__/g, count);
+                    list.insertAdjacentHTML('beforeend', newFormHtml);
+                    totalForms.value = count + 1;
+                });
+            }
+        }
+
+        // Initialize
+        addForm('add-date-btn', 'date-form-list', 'empty-date-form', 'dates');
+        addForm('add-image-btn', 'image-form-list', 'empty-image-form', 'gallery_images');
+
+        // 2. DELETE ROW FUNCTION (Global Delegate)
+        document.body.addEventListener('click', function(e) {
+            // Check if clicked element is a delete button (or icon inside it)
+            const btn = e.target.closest('.delete-row-btn');
+            
+            if (btn) {
+                e.preventDefault();
+                const row = btn.closest('.form-row-item');
+                
+                // Find the hidden DELETE checkbox inside this row
+                const deleteCheckbox = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+                
+                if (deleteCheckbox) {
+                    // CASE A: Existing Database Record
+                    // We check the box and hide the row visually.
+                    // When form is submitted, Django sees the check and deletes it.
+                    deleteCheckbox.checked = true;
+                    row.style.display = 'none'; 
+                } else {
+                    // CASE B: New Dynamic Row (Not in DB yet)
+                    // Just remove it from DOM.
+                    row.remove();
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}
