@@ -17,13 +17,13 @@ class TourForm(forms.ModelForm):
 
 class TourDateForm(forms.ModelForm):
     start_date = forms.DateField(
-        input_formats=['%d-%m-%Y', '%Y-%m-%d'],  # Accept both formats
+        input_formats=['%d-%m-%Y', '%Y-%m-%d'],  
         widget=forms.DateInput(
-            format='%d-%m-%Y',  # Display as DD-MM-YYYY
+            format='%d-%m-%Y',
             attrs={
                 'class': 'form-control', 
                 'placeholder': 'DD-MM-YYYY',
-                'type': 'text',  # Force text so browser calendar doesn't override format
+                'type': 'text',
                 'autocomplete': 'off'
             }
         )

@@ -5,21 +5,15 @@ from django.db.models import Q
 from django.forms import inlineformset_factory
 
 from .models import Tour, TourDate, TourImage
-from .forms import TourForm, TourDateForm  # We will create this file next
-
-# ==========================================
-# 1. PUBLIC VIEWS (For Customers)
-# ==========================================
+from .forms import TourForm, TourDateForm 
 
 def home(request):
     """
     The Homepage.
     Displays all ACTIVE tours and handles the search bar.
     """
-    # Only show active tours to customers
     tours = Tour.objects.filter(is_active=True).order_by('name')
     
-    # Search Logic
     query = request.GET.get('q')
     if query:
         tours = tours.filter(
@@ -37,8 +31,6 @@ def tour_detail(request, tour_id):
     """
     tour = get_object_or_404(Tour, pk=tour_id)
     
-    # Filter dates: Only show dates that are TODAY or in the FUTURE.
-    # We don't want users booking a trip that happened last week!
     available_dates = tour.dates.filter(start_date__gte=date.today()).order_by('start_date')
     
     return render(request, 'tour_detail.html', {
@@ -47,16 +39,11 @@ def tour_detail(request, tour_id):
     })
 
 
-# ==========================================
-# 2. HELPER: FORMSET FACTORIES
-# ==========================================
-# These allow us to edit Dates and Images on the same page as the Tour.
-
 TourDateFormSet = inlineformset_factory(
     Tour, TourDate, 
     form=TourDateForm, 
-    extra=0,            # Don't show empty extra rows by default
-    can_delete=True     # Allow admin to delete a date
+    extra=0,            
+    can_delete=True     
 )
 
 TourImageFormSet = inlineformset_factory(
@@ -66,11 +53,6 @@ TourImageFormSet = inlineformset_factory(
     can_delete=True
 )
 
-
-# ==========================================
-# 3. ADMIN VIEWS (Management)
-# ==========================================
-
 @staff_member_required
 def admin_tour_list(request):
     """
@@ -78,7 +60,6 @@ def admin_tour_list(request):
     """
     tours = Tour.objects.all().order_by('-created_at')
     
-    # Admin Search
     query = request.GET.get('q')
     if query:
         tours = tours.filter(
@@ -102,7 +83,6 @@ def admin_add_tour(request):
         if form.is_valid() and date_formset.is_valid() and image_formset.is_valid():
             tour = form.save()
             
-            # Save Formsets (Link them to the new tour)
             date_formset.instance = tour
             date_formset.save()
             
@@ -135,8 +115,6 @@ def admin_edit_tour(request, tour_id):
     if request.method == 'POST':
         form = TourForm(request.POST, request.FILES, instance=tour)
         
-        # We filter the QuerySet so the formset only handles FUTURE dates.
-        # This prevents the admin from accidentally deleting old historical data.
         date_formset = TourDateFormSet(
             request.POST, 
             instance=tour, 
@@ -153,7 +131,6 @@ def admin_edit_tour(request, tour_id):
     else:
         form = TourForm(instance=tour)
         
-        # Load formset with future dates only
         date_formset = TourDateFormSet(
             instance=tour, 
             prefix='dates',

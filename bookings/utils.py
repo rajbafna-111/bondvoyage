@@ -10,10 +10,8 @@ def render_to_pdf(template_src, context_dict={}):
     html  = template.render(context_dict)
     result = BytesIO()
     
-    # 1. Use UTF-8 to support Rupee symbol (₹) and other special chars
     pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
     
-    # 2. Return the raw value so the View can set headers (Filename, etc.)
     if not pdf.err:
         return result.getvalue()
         

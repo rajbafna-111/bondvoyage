@@ -7,7 +7,7 @@ from tours.models import TourDate
 
 class BookingForm(forms.ModelForm):
     tour_date = forms.ModelChoiceField(
-        queryset=TourDate.objects.none(), # Empty by default, populated in __init__
+        queryset=TourDate.objects.none(), # Empty by default
         label="Select Date", 
         widget=forms.Select(attrs={'class': 'form-select'})
     )
@@ -27,23 +27,17 @@ class BookingForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         
         if self.tour:
-            # Show dates for THIS tour that are in the FUTURE
             self.fields['tour_date'].queryset = TourDate.objects.filter(
                 tour=self.tour,
                 start_date__gte=date.today()
             ).order_by('start_date')
 
     def clean(self):
-        """
-        Validate Seat Availability.
-        Prevents overbooking.
-        """
         cleaned_data = super().clean()
         tour_date = cleaned_data.get('tour_date')
         number_of_people = cleaned_data.get('number_of_people')
 
         if tour_date and number_of_people:
-            # Calculate currently booked seats for this specific date
             booked_seats = Booking.objects.filter(
                 tour_date=tour_date, 
                 status__in=['Pending', 'Confirmed']

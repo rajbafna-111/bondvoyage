@@ -5,33 +5,21 @@ from django.db.models import Sum, Q
 from django.contrib import messages
 from django.http import HttpResponse
 from datetime import datetime, date
-
-# Models & Forms
 from tours.models import Tour, TourDate
 from .models import Booking
 from .forms import BookingForm
-from .utils import render_to_pdf  # We will create this utility file next
-
-# ==========================================
-# 1. CUSTOMER BOOKING FLOW
-# ==========================================
+from .utils import render_to_pdf
 
 @login_required
 def book_tour(request, tour_id):
-    """
-    Step 1: User selects a Date and Number of People.
-    We don't save to DB yet; we save to Session to prevent 'ghost' bookings.
-    """
     tour = get_object_or_404(Tour, id=tour_id)
     
     if request.method == 'POST':
-        # Pass 'tour' to form so it can validate if the date belongs to this tour
         form = BookingForm(request.POST, tour=tour)
         
         if form.is_valid():
             data = form.cleaned_data
-            
-            # Save to Session (Temporary Storage)
+
             request.session['booking_data'] = {
                 'tour_id': tour.id,
                 'tour_date_id': data['tour_date'].id, 
@@ -41,7 +29,6 @@ def book_tour(request, tour_id):
             return redirect('payment_page')
             
     else:
-        # Pass 'tour' to filter the date dropdown to only show THIS tour's dates
         form = BookingForm(tour=tour)
 
     return render(request, 'book_tour.html', {'form': form, 'tour': tour})
@@ -55,7 +42,6 @@ def payment_page(request):
     """
     booking_data = request.session.get('booking_data')
     
-    # Security: If they try to skip Step 1, send them back
     if not booking_data:
         messages.error(request, "No booking in progress.")
         return redirect('home')
@@ -67,10 +53,8 @@ def payment_page(request):
         transaction_id = request.POST.get('transaction_id')
         
         if transaction_id:
-            # Fetch the actual Date Object
             tour_date = get_object_or_404(TourDate, id=booking_data['tour_date_id'])
             
-            # Create the Database Record
             Booking.objects.create(
                 user=request.user,
                 tour=tour,
@@ -82,7 +66,6 @@ def payment_page(request):
                 payment_status='Pending' # Admin needs to verify money
             )
             
-            # Clear the session so they can't submit twice
             del request.session['booking_data']
             
             messages.success(request, "Payment Submitted! Please wait for Admin Verification.")
@@ -109,7 +92,6 @@ def download_ticket(request, booking_id):
     if request.user != booking.user and not request.user.is_staff:
         return HttpResponse("Unauthorized", status=403)
     
-    # FIX: Allow ticket download if status is 'Confirmed' OR 'Completed'
     if booking.status not in ['Confirmed', 'Completed']:
          return HttpResponse("Ticket is only available for Confirmed or Completed bookings.", status=400)
 
@@ -130,9 +112,6 @@ def download_ticket(request, booking_id):
         
     return HttpResponse("Error Rendering PDF", status=400)
 
-# ==========================================
-# 2. ADMIN MANAGEMENT VIEWS
-# ==========================================
 
 @staff_member_required
 def admin_booking_list(request):
@@ -141,13 +120,11 @@ def admin_booking_list(request):
     """
     bookings = Booking.objects.all().order_by('-booking_date')
     
-    # Get Filter Params
     status_filter = request.GET.get('status')
     query = request.GET.get('q')
     start_date = request.GET.get('start_date') 
     end_date = request.GET.get('end_date')     
 
-    # Apply Filters
     if status_filter:
         bookings = bookings.filter(status=status_filter)
 
@@ -179,7 +156,6 @@ def admin_update_booking_status(request, booking_id, action):
     """
     booking = get_object_or_404(Booking, id=booking_id)
 
-    # 1. Verification Phase
     if action == 'verify_payment':
         booking.status = 'Confirmed'
         booking.payment_status = 'Paid'
@@ -190,7 +166,6 @@ def admin_update_booking_status(request, booking_id, action):
         booking.payment_status = 'Rejected'
         messages.warning(request, f"Payment for Booking #{booking.id} rejected.")
 
-    # 2. Post-Trip Phase
     elif action == 'mark_completed':
         booking.status = 'Completed'
         messages.success(request, f"Tour #{booking.id} marked as Completed!")
@@ -211,7 +186,6 @@ def admin_payment_report(request):
     """
     payments = Booking.objects.all().order_by('-booking_date')
 
-    # Filters
     status_filter = request.GET.get('status')
     start_date = request.GET.get('start_date') 
     end_date = request.GET.get('end_date')     
@@ -229,7 +203,6 @@ def admin_payment_report(request):
             Q(transaction_id__icontains=query)
         )
 
-    # Totals
     total_revenue = Booking.objects.filter(payment_status='Paid').aggregate(Sum('total_price'))['total_price__sum'] or 0
     report_total = payments.aggregate(Sum('total_price'))['total_price__sum'] or 0
 

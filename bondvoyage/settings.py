@@ -8,28 +8,14 @@ Refined and Organized for BondVoyage Travel Portal.
 import os
 from pathlib import Path
 
-# ==========================================
-# 1. CORE PROJECT PATHS
-# ==========================================
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# ==========================================
-# 2. SECURITY SETTINGS
-# ==========================================
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-y@891zc7xa$%mvlx1%5tk_(i=u#sh&+_v1w^!j8pt_&q)70e!k'
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']  # Allow all hosts for local development
+ALLOWED_HOSTS = ['*']
 
-
-# ==========================================
-# 3. APPLICATION DEFINITION
-# ==========================================
 INSTALLED_APPS = [
     # Default Django Apps
     'django.contrib.admin',
@@ -38,15 +24,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.postgres',  # Enabled for advanced DB features
+    'django.contrib.postgres',
 
     # Third-Party Apps
     'ckeditor',                 # Rich text editor for descriptions
 
-    # My Custom Apps
-    'users',                    # Handles Custom User & Profiles
-    'tours',                    # Handles Packages, Destinations & Itineraries
-    'bookings',                 # Handles Booking Logic & Payments
+    # My Apps
+    'users',                    
+    'tours',                    
+    'bookings',                 
 ]
 
 MIDDLEWARE = [
@@ -80,25 +66,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'bondvoyage.wsgi.application'
 
 
-# ==========================================
-# 4. DATABASE (PostgreSQL)
-# ==========================================
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'bondvoyage_db',
         'USER': 'postgres',
-        'PASSWORD': 'postgres',  # Ensure this matches your local PGAdmin password
+        'PASSWORD': 'postgres',
         'HOST': 'localhost',
         'PORT': '5432',
     }
 }
 
 
-# ==========================================
-# 5. AUTHENTICATION & PASSWORDS
-# ==========================================
-# Point to our custom user model
 AUTH_USER_MODEL = 'users.CustomUser'
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -108,39 +87,26 @@ AUTH_PASSWORD_VALIDATORS = [
     { 'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
-# Redirects after authentication
-LOGIN_URL = 'login'              # The URL name for the login page
-LOGIN_REDIRECT_URL = 'home'      # Redirect here after successful login
-LOGOUT_REDIRECT_URL = 'home'     # Redirect here after logout
+LOGIN_URL = 'login'              
+LOGIN_REDIRECT_URL = 'home'      
+LOGOUT_REDIRECT_URL = 'home' 
 
 
-# ==========================================
-# 6. INTERNATIONALIZATION
-# ==========================================
 LANGUAGE_CODE = 'en-us'
 
-# Changed to Indian Standard Time (IST) for accurate booking timestamps
 TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 USE_TZ = True
 
 
-# ==========================================
-# 7. STATIC & MEDIA FILES
-# ==========================================
-# Static files (CSS, JavaScript, Images used by the website design)
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-# Media files (Images uploaded by users/admins, e.g., Tour Photos)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
-# ==========================================
-# 8. OTHER SETTINGS
-# ==========================================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

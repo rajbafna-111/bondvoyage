@@ -7,8 +7,6 @@ class CustomUser(AbstractUser):
     Extends Django's default User to include Roles, Phone, and Address.
     """
     
-    # --- Role Constants ---
-    # We define these as constants to avoid typos in our code later
     ADMIN = 'admin'
     CUSTOMER = 'customer'
     
@@ -17,7 +15,6 @@ class CustomUser(AbstractUser):
         (CUSTOMER, 'Customer'),
     ]
     
-    # --- Custom Fields ---
     role = models.CharField(
         max_length=10, 
         choices=ROLE_CHOICES, 
@@ -39,11 +36,8 @@ class CustomUser(AbstractUser):
     )
 
     def __str__(self):
-        # Shows "rajbafna111 (Admin)" in the admin panel
         return f"{self.username} ({self.get_role_display()})"
 
-    # --- Helper Properties ---
-    # These make it super easy to check roles in templates and views!
     @property
     def is_admin(self):
         return self.role == self.ADMIN
